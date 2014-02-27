@@ -11,19 +11,31 @@
 #include <string>
 #include <map>
 
+#include "File.h"
+#include "MapStringToConstructor.h"
+
+#include "boost/date_time/gregorian/gregorian.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
+
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 
 using namespace std;
+
+
 
 class Car
 {
 public:
-    enum FuelType
-    {
-        UNKNOWN_FUEL,
-        PETROLEUM_FUEL,
-        ELECTRICITY_FUEL,
-        HELLIUM_FUEL
-    };
+	enum FuelType
+	    {
+	        UNKNOWN_FUEL,
+	        PETROLEUM_FUEL,
+	        ELECTRICITY_FUEL,
+	        HELLIUM_FUEL
+	    };
+
 
     virtual ~Car();
 
@@ -89,14 +101,80 @@ public:
 };
 
 
+class Interface{
+public:
+	virtual ~Interface(){}
+	virtual void f()=0;
+
+};
+
+class Implementation:public Interface{
+public:
+	virtual ~Implementation(){}
+	void f(){}
+};
+
+
+class Vehicle{
+private:
+
+	float tankCapacity;
+	float fuelInTank;
+	//FuelType requiredFuelType;
+	//static std::map < FuelType, std::string> fuelUnitsMap;
+	float amountToTake;
+
+
+
+	//date arrivalDate; 					//not here
+
+	ptime waitingForFuelTime;
+	ptime waitingForUpdatedStatisticsTime;
+
+	float cash;
+
+public:
+
+
+	virtual ptime evaluateFuelingTime() = 0;
+	virtual void fill()=0;
+	virtual ~Vehicle(){}
+
+
+};
+
+
+class PetrolCar: public Vehicle{
+public:
+	ptime evaluateFuelingTime(){
+		ptime t=second_clock::local_time();
+	    return t;
+	}
+	void fill(){}
+	virtual ~PetrolCar(){}
+
+
+};
+
+
 
 
 
 int main() {
+	Factory fac=Factory();
+	Super child=*(fac.create("c1")).get();
+	cout<<typeid(child).name()<<endl;
 
-	CarFactory carFactory=CarFactory();
-	unique_ptr<PetrolFueledCar> ptr=carFactory.newCar(Car::PETROLEUM_FUEL);
+	child.f();
+
+
+
+
+
+
+	//unique_ptr<PetrolFueledCar> ptr=carFactory.newCar(Car::PETROLEUM_FUEL);
 	std::cout<<"works";
 	return 0;
+
 }
 
